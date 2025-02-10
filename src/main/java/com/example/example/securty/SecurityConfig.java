@@ -44,19 +44,19 @@ public class SecurityConfig {
                                 .csrf(csrf -> csrf.disable())
                                 // Configuración de las reglas de autorización
                                 .authorizeHttpRequests(auth -> auth
-                                                // Permitir acceso a rutas públicas
-                                                .requestMatchers("/public/**").permitAll()
                                                 // Permitir acceso a rutas de autenticación
                                                 .requestMatchers("/auth/**").permitAll()
+                                                // Permitir acceso a rutas de autenticación
+                                                .requestMatchers("/api/users/**").permitAll()
                                                 // Requerir autenticación para cualquier otra ruta
+                                                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**",
+                                                                "/swagger-resources/**", "/swagger-ui.html")
+                                                .permitAll()
                                                 .anyRequest().authenticated())
                                 // Manejar errores de autenticación con JwtEntryPoint
                                 .exceptionHandling(exception -> exception
                                                 .authenticationEntryPoint(jwtEntryPoint))
-                                // Añadir el filtro de autenticación JWT antes del filtro de autenticación de
-                                // usuario y contraseña
                                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-                                // Configuración de la página de inicio de sesión personalizada (opcional)
                                 .formLogin(form -> form
                                                 .loginPage("/login")
                                                 .permitAll());
