@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.example.entity.Auction;
+import com.example.example.securty.JwtProvider;
 import com.example.example.service.AuctionService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 @RestController
@@ -25,11 +27,29 @@ import jakarta.validation.Valid;
 public class AuctionController {
     @Autowired
     private AuctionService auctionService;
+    @Autowired
+    private JwtProvider JwtProvider;
 
     @GetMapping
     // @JsonView(Views.Public.class)
     public List<Auction> getAllAuctions() {
         return auctionService.findAll();
+    }
+
+    public String obtenerUsuarioDesdeToken(HttpServletRequest request) {
+        String token = extraerTokenDeRequest(request);
+        if (token != null) {
+            return JwtProvider.extractUsername(token);
+        }
+        return null;
+    }
+
+    private String extraerTokenDeRequest(HttpServletRequest request) {
+        String headerAuth = request.getHeader("Authorization");
+        if (headerAuth != null && headerAuth.startsWith("Bearer ")) {
+            return headerAuth.substring(7);
+        }
+        return null;
     }
 
     @GetMapping("/{id}")
@@ -40,8 +60,8 @@ public class AuctionController {
     }
 
     @PostMapping
-    public ResponseEntity<String> createAuction(@Valid @RequestBody Auction auction) {
-        auctionService.save(auction);
+    public ResponseEntity<String> createAuction(@Valid @RequestBody Auction auction, HttpServletRequest request) {
+        auctionService.save(auction, request);
         return ResponseEntity.ok("Subasta creada correctamente");
     }
 
