@@ -22,6 +22,7 @@ import com.example.example.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 @RestController
@@ -52,6 +53,7 @@ public class UserController {
     @ApiResponse(responseCode = "400", description = "Error en la solicitud")
     @PostMapping
     public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
+
         return ResponseEntity.ok(userService.save(user));
     }
 
@@ -60,8 +62,9 @@ public class UserController {
     @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
     @ApiResponse(responseCode = "400", description = "Error en la solicitud")
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User userDetails) {
-        Optional<User> updatedUser = userService.update(id, userDetails);
+    public ResponseEntity<User> updateUser(HttpServletRequest request, @PathVariable Long id,
+            @RequestBody User userDetails) {
+        Optional<User> updatedUser = userService.update(id, userDetails, request);
         return updatedUser.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }

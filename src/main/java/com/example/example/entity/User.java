@@ -14,6 +14,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
@@ -25,15 +26,18 @@ public class User {
 
     @NotNull
     @NotBlank(message = "El nombre de usuario no puede estar vacío")
+    @Size(min = 3, message = "El nombre de usuario debe tener al menos 3 caracteres")
     private String username;
 
     @NotNull
     @NotBlank(message = "El correo electrónico no puede estar vacío")
     @Email(message = "Debe ser un correo electrónico válido")
+    @Size(min = 3, message = "El correo electrónico debe tener al menos 3 caracteres")
     private String email;
 
     @NotNull
     @NotBlank(message = "La contraseña no puede estar vacía")
+    @Size(min = 6, message = "La contraseña debe tener al menos 6 caracteres")
     private String password;
 
     // Relación con las pujas

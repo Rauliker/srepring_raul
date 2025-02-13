@@ -12,6 +12,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.example.example.entity.User;
 import com.example.example.repository.UserRepository;
+import com.example.example.securty.JwtProvider;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 public class UserService {
@@ -19,6 +22,8 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private JwtProvider JwtProvider;
 
     public List<User> findAll() {
         return userRepository.findAll();
@@ -30,6 +35,22 @@ public class UserService {
 
     public Optional<User> findByUsername(String userneme) {
         return userRepository.findByUsername(userneme);
+    }
+
+    public String obtenerUsuarioDesdeToken(HttpServletRequest request) {
+        String token = extraerTokenDeRequest(request);
+        if (token != null) {
+            return JwtProvider.extractUsername(token);
+        }
+        return null;
+    }
+
+    private String extraerTokenDeRequest(HttpServletRequest request) {
+        String headerAuth = request.getHeader("Authorization");
+        if (headerAuth != null && headerAuth.startsWith("Bearer ")) {
+            return headerAuth.substring(7);
+        }
+        return null;
     }
 
     public User save(User user) {
@@ -54,8 +75,10 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    public Optional<User> update(Long id, User userDetails) {
+    public Optional<User> update(Long id, User userDetails, HttpServletRequest request) {
         // Buscar el usuario por ID
+
+        String username = this.obtenerUsuarioDesdeToken(request);
         Optional<User> userOptional = userRepository.findById(id);
 
         if (userOptional.isEmpty()) {
@@ -63,6 +86,9 @@ public class UserService {
         }
 
         User user = userOptional.get();
+        if (!user.getUsername().equals(username)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para actualizar este usuario");
+        }
         if (userRepository.existsByUsername(userDetails.getUsername())
                 && !user.getUsername().equals(userDetails.getUsername())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede repetir el nombre de usuario");
