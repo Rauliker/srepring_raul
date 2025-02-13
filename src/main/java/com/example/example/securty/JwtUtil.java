@@ -2,6 +2,8 @@ package com.example.example.securty;
 
 import java.util.Date;
 
+import org.springframework.beans.factory.annotation.Value;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -11,12 +13,16 @@ public class JwtUtil {
     // configúralo externamente)
     private static final String SECRET_KEY = "mi_clave_secreta";
 
+    @Value("${jwt.expiration}")
+    private int expiration;
+
     // Genera un token para un usuario dado
-    public static String generateToken(String username) {
+    public String generateToken(String username) {
         return Jwts.builder()
                 .setSubject(username)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + expiration * 1000)) // 10 horas de expiración
+
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
                 .compact();
     }
