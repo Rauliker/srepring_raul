@@ -102,8 +102,37 @@ public class AuctionService {
         return auctionRepository.save(auction);
     }
 
-    public void deleteById(Long id) {
+    public void deleteById(Long id, HttpServletRequest request) {
+        String username = this.obtenerUsuarioDesdeToken(request);
+
+        Optional<User> user = userRepository.findByUsername(username);
+        if (user.isEmpty()) {
+            logger.error("Usuario no encontrado con el correo electrónico o nombre de usuario: {}", username);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "Usuario no encontrado con el correo electrónico o nombre de usuario proporcionado");
+        }
+
+        List<Auction> auctions = auctionRepository.findByUserName(username);
+        if (auctions.isEmpty()) {
+            logger.error("No hay subastas para el usuario con id: {}", user.get().getEmail());
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No hay subastas para el usuario");
+        }
+
+        // Verificar si la subasta con el ID proporcionado existe
+        Optional<Auction> auctionToDelete = auctionRepository.findById(id);
+        if (auctionToDelete.isEmpty()) {
+            logger.error("La subasta con id {} no existe", id);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "La subasta no existe");
+        }
+
+        // Verificar si la subasta pertenece al usuario autenticado
+        if (!auctionToDelete.get().getUser().getUsername().equals(username)) {
+            logger.error("El usuario {} no tiene permisos para eliminar la subasta con id {}", username, id);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permisos para eliminar esta subasta");
+        }
+
         auctionRepository.deleteById(id);
+        logger.info("Subasta con id {} eliminada correctamente por el usuario {}", id, username);
     }
 
 }

@@ -66,8 +66,8 @@ public class AuctionController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAuction(@PathVariable Long id) {
-        auctionService.deleteById(id);
+    public ResponseEntity<Void> deleteAuction(@PathVariable Long id, HttpServletRequest request) {
+        auctionService.deleteById(id, request);
         return ResponseEntity.noContent().build();
     }
 
