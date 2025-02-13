@@ -3,6 +3,7 @@ package com.example.example.securty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -47,7 +48,7 @@ public class SecurityConfig {
                                                 // Permitir acceso a rutas de autenticación
                                                 .requestMatchers("/auth/**").permitAll()
                                                 // Permitir acceso a rutas de autenticación
-                                                .requestMatchers("/api/users/**").permitAll()
+                                                .requestMatchers(HttpMethod.POST, "/api/users/**").permitAll()
                                                 // Requerir autenticación para cualquier otra ruta
                                                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**",
                                                                 "/swagger-resources/**", "/swagger-ui.html")

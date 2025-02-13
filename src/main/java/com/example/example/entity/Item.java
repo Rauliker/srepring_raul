@@ -17,11 +17,11 @@ public class Item {
     private Long id;
 
     @NotNull
-    @NotBlank(message = "El correo nombre no puede estar vacío")
+    @NotBlank(message = "El nombre no puede estar vacío")
     private String name;
 
     @NotNull
-    @NotBlank(message = "La descripcion puede estar vacía")
+    @NotBlank(message = "La descripcion no puede estar vacía")
     private String description;
 
     @NotNull
@@ -58,10 +58,5 @@ public class Item {
 
     public void setStartingPrice(BigDecimal startingPrice) {
         this.startingPrice = startingPrice;
-    }
-
-    public Object getItem() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getItem'");
     }
 }
