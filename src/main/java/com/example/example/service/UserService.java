@@ -48,6 +48,7 @@ public class UserService {
     }
 
     public void deleteById(Long id) {
+        // Eliminar el usuario
         userRepository.deleteById(id);
     }
 

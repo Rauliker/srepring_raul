@@ -16,6 +16,7 @@ import jakarta.validation.constraints.NotNull;
 
 @Entity
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -33,15 +34,26 @@ public class User {
     @NotBlank(message = "La contraseña no puede estar vacía")
     private String password;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Auction> auctions;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Bid> bids;
-
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> roles;
 
+    // Relación con las pujas
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Bid> bids;
+
+    // Relación con las subastas
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Auction> auctions;
+
+    // Roles posibles
+    public static final String ROLE_USER = "ROLE_USER";
+    public static final String ROLE_ADMIN = "ROLE_ADMIN";
+
+    public User() {
+        this.roles = List.of(ROLE_USER); // Asigna un rol por defecto
+    }
+
+    // Getters y Setters
     public Long getId() {
         return id;
     }
@@ -74,12 +86,12 @@ public class User {
         this.password = password;
     }
 
-    public List<Auction> getAuctions() {
-        return auctions;
+    public List<String> getRoles() {
+        return roles;
     }
 
-    public void setAuctions(List<Auction> auctions) {
-        this.auctions = auctions;
+    public void setRoles(List<String> roles) {
+        this.roles = roles;
     }
 
     public List<Bid> getBids() {
@@ -88,5 +100,25 @@ public class User {
 
     public void setBids(List<Bid> bids) {
         this.bids = bids;
+    }
+
+    public List<Auction> getAuctions() {
+        return auctions;
+    }
+
+    public void setAuctions(List<Auction> auctions) {
+        this.auctions = auctions;
+    }
+
+    // Método para añadir un rol al usuario
+    public void addRole(String role) {
+        if (!this.roles.contains(role)) {
+            this.roles.add(role);
+        }
+    }
+
+    // Método para verificar si el usuario tiene un rol específico
+    public boolean hasRole(String role) {
+        return this.roles.contains(role);
     }
 }

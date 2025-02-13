@@ -41,7 +41,7 @@ public class Auction {
     @NotNull
     private BigDecimal highestBid = BigDecimal.ZERO;
 
-    @OneToMany(mappedBy = "auction", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "auction", cascade = CascadeType.ALL, orphanRemoval = true)
     public List<Bid> bids = new ArrayList<>();
 
     // Getters y Setters
