@@ -8,7 +8,6 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -65,15 +64,6 @@ public class UserController {
         Optional<User> updatedUser = userService.update(id, userDetails);
         return updatedUser.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
-    }
-
-    @Operation(summary = "Eliminar un usuario por id")
-    @ApiResponse(responseCode = "204", description = "Usuario eliminado con éxito")
-    @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        userService.deleteById(id);
-        return ResponseEntity.noContent().build();
     }
 
     @ExceptionHandler(org.springframework.web.bind.MethodArgumentNotValidException.class)
