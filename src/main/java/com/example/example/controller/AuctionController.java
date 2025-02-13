@@ -11,11 +11,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.example.example.entity.Auction;
 import com.example.example.service.AuctionService;
@@ -45,16 +43,6 @@ public class AuctionController {
     public ResponseEntity<String> createAuction(@Valid @RequestBody Auction auction) {
         auctionService.save(auction);
         return ResponseEntity.ok("Subasta creada correctamente");
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<String> updateAuction(@PathVariable Long id, @Valid @RequestBody Auction auctionDetails) {
-        try {
-            auctionService.update(id, auctionDetails);
-            return ResponseEntity.ok("Subasta actualizada correctamente");
-        } catch (ResponseStatusException ex) {
-            return ResponseEntity.status(ex.getStatusCode()).body(ex.getReason());
-        }
     }
 
     @DeleteMapping("/{id}")
