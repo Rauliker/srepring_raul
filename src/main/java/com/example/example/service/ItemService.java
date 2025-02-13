@@ -42,6 +42,7 @@ public class ItemService {
     }
 
     public Optional<Item> update(Long id, Item itemDetails) {
+        // Buscar el item por ID
         Optional<Item> itemOptional = itemRepository.findById(id);
 
         if (itemOptional.isEmpty()) {
@@ -50,17 +51,26 @@ public class ItemService {
 
         Item item = itemOptional.get();
 
-        if (itemDetails.getName() == null || itemDetails.getName().isEmpty()) {
+        // Validar que el nombre del item no esté vacío
+        if (itemDetails.getName() != null && itemDetails.getName().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El nombre del item no puede estar vacío");
         }
 
-        if (itemDetails.getStartingPrice() == null || itemDetails.getStartingPrice().compareTo(BigDecimal.ZERO) < 0) {
+        // Validar que el precio inicial sea un valor positivo
+        if (itemDetails.getStartingPrice() != null && itemDetails.getStartingPrice().compareTo(BigDecimal.ZERO) <= 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El precio inicial debe ser un valor positivo");
         }
 
-        item.setName(itemDetails.getName());
-        item.setDescription(itemDetails.getDescription());
-        item.setStartingPrice(itemDetails.getStartingPrice());
+        // Actualizar solo los campos no nulos
+        if (itemDetails.getName() != null) {
+            item.setName(itemDetails.getName());
+        }
+        if (itemDetails.getDescription() != null) {
+            item.setDescription(itemDetails.getDescription());
+        }
+        if (itemDetails.getStartingPrice() != null) {
+            item.setStartingPrice(itemDetails.getStartingPrice());
+        }
 
         logger.info("Updating item: {}", id);
         return Optional.of(itemRepository.save(item));

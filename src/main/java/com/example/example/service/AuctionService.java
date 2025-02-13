@@ -90,32 +90,27 @@ public class AuctionService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Subasta no encontrada con el id proporcionado");
         }
 
-        Optional<User> user = userRepository.findByEmailOrUsername(auctionDetails.getUser().getEmail(),
-                auctionDetails.getUser().getUsername());
-        if (user.isEmpty()) {
-            logger.error("Usuario no encontrado con el correo electrónico o nombre de usuario: {}",
-                    auctionDetails.getUser().getUsername());
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    "Usuario no encontrado con el correo electrónico o nombre de usuario proporcionado");
-        }
-        auctionDetails.setUser(user.get());
+        Auction existingAuctionEntity = existingAuction.get();
 
-        if (auctionDetails.getItem().getId() == null || !itemRepository.existsById(auctionDetails.getItem().getId())) {
-            logger.error("Artículo no encontrado con id: {}", auctionDetails.getItem().getId());
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Artículo no encontrado con el id proporcionado");
+        // Asegurarse de que no se modifique el usuario, el artículo ni el highestBid
+        if (!auctionDetails.getUser().equals(existingAuctionEntity.getUser())) {
+            logger.error("No se puede cambiar el creador de la subasta");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede cambiar el creador de la subasta");
         }
 
-        Optional<Auction> existingActiveAuction = auctionRepository.findByItemAndEndTimeGreaterThan(
-                auctionDetails.getItem(),
-                LocalDateTime.now());
-        if (existingActiveAuction.isPresent() && !existingActiveAuction.get().getId().equals(id)) {
-            logger.error("El artículo {} ya está en una subasta activa", auctionDetails.getItem().getId());
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El artículo ya está en una subasta activa");
+        if (!auctionDetails.getItem().equals(existingAuctionEntity.getItem())) {
+            logger.error("No se puede cambiar el artículo de la subasta");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede cambiar el artículo de la subasta");
         }
 
-        auctionDetails.setItem(itemRepository.findById(auctionDetails.getItem().getId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Artículo no encontrado")));
+        if (auctionDetails.getHighestBid() != null
+                && !auctionDetails.getHighestBid().equals(existingAuctionEntity.getHighestBid())) {
+            logger.error("No se puede cambiar la oferta más alta de la subasta");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "No se puede cambiar la oferta más alta de la subasta");
+        }
 
+        // Si la fecha de inicio o finalización es válida, actualizar las fechas
         if (auctionDetails.getStartTime() != null && auctionDetails.getEndTime() != null) {
             if (auctionDetails.getStartTime().isAfter(auctionDetails.getEndTime())) {
                 LocalDateTime temp = auctionDetails.getStartTime();
@@ -128,5 +123,4 @@ public class AuctionService {
         auctionDetails.setId(id);
         return Optional.of(auctionRepository.save(auctionDetails));
     }
-
 }

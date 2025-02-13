@@ -33,6 +33,7 @@ public class UserService {
     }
 
     public User save(User user) {
+        // Validación de usuario único por nombre y correo
         if (userRepository.existsByUsername(user.getUsername())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede repetir el nombre de usuario");
         }
@@ -43,6 +44,7 @@ public class UserService {
         if (user.getPassword() == null || user.getPassword().length() < 6) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La contraseña debe tener al menos 6 caracteres");
         }
+
         logger.info("Saving user: {}", user.getId());
         return userRepository.save(user);
     }
@@ -61,27 +63,32 @@ public class UserService {
         }
 
         User user = userOptional.get();
-
         if (userRepository.existsByUsername(userDetails.getUsername())
                 && !user.getUsername().equals(userDetails.getUsername())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede repetir el nombre de usuario");
         }
 
-        if (userRepository.existsByEmail(userDetails.getEmail()) && !user.getEmail().equals(userDetails.getEmail())) {
+        if (userRepository.existsByEmail(userDetails.getEmail())
+                && !user.getEmail().equals(userDetails.getEmail())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede repetir el email");
         }
 
+        // Validar si la contraseña es válida
         if (userDetails.getPassword() != null && userDetails.getPassword().length() < 6) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La contraseña debe tener al menos 6 caracteres");
         }
 
-        user.setUsername(userDetails.getUsername());
-        user.setEmail(userDetails.getEmail());
-        user.setPassword(userDetails.getPassword());
+        if (userDetails.getUsername() != null) {
+            user.setUsername(userDetails.getUsername());
+        }
+        if (userDetails.getEmail() != null) {
+            user.setEmail(userDetails.getEmail());
+        }
+        if (userDetails.getPassword() != null) {
+            user.setPassword(userDetails.getPassword());
+        }
 
         logger.info("Updating user: {}", user.getId());
-
         return Optional.of(userRepository.save(user));
     }
-
 }

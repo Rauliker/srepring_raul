@@ -3,9 +3,7 @@ package com.example.example.entity;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -34,9 +32,6 @@ public class User {
     @NotBlank(message = "La contraseña no puede estar vacía")
     private String password;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    private List<String> roles;
-
     // Relación con las pujas
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Bid> bids;
@@ -44,14 +39,6 @@ public class User {
     // Relación con las subastas
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Auction> auctions;
-
-    // Roles posibles
-    public static final String ROLE_USER = "ROLE_USER";
-    public static final String ROLE_ADMIN = "ROLE_ADMIN";
-
-    public User() {
-        this.roles = List.of(ROLE_USER); // Asigna un rol por defecto
-    }
 
     // Getters y Setters
     public Long getId() {
@@ -86,14 +73,6 @@ public class User {
         this.password = password;
     }
 
-    public List<String> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(List<String> roles) {
-        this.roles = roles;
-    }
-
     public List<Bid> getBids() {
         return bids;
     }
@@ -110,15 +89,4 @@ public class User {
         this.auctions = auctions;
     }
 
-    // Método para añadir un rol al usuario
-    public void addRole(String role) {
-        if (!this.roles.contains(role)) {
-            this.roles.add(role);
-        }
-    }
-
-    // Método para verificar si el usuario tiene un rol específico
-    public boolean hasRole(String role) {
-        return this.roles.contains(role);
-    }
 }

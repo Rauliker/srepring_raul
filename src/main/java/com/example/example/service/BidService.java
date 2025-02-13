@@ -92,9 +92,4 @@ public class BidService {
     public void deleteById(Long id) {
         bidRepository.deleteById(id);
     }
-
-    public Optional<Bid> update(Long id, Bid bidDetails) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
-    }
 }

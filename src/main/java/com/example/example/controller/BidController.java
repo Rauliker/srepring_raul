@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,13 +38,6 @@ public class BidController {
     @PostMapping
     public ResponseEntity<Bid> createBid(@Valid @RequestBody Bid bid) {
         return ResponseEntity.ok(bidService.save(bid));
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<Bid> updateBid(@PathVariable Long id, @Valid @RequestBody Bid bidDetails) {
-        return bidService.update(id, bidDetails)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
